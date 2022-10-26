@@ -1,2 +1,1 @@
 Pillow~=9.2.0
-imageio~=2.22.2
