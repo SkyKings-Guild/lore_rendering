@@ -1,8 +1,8 @@
 # BSD 3-Clause License
 
-Copyright (c) 2022, poke5352
+Copyright (c) 2022 poke5352
 
-Copyright (c) 2023-present, SkyKings
+Copyright (c) 2023-present plun1331
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
