@@ -1,0 +1,30 @@
+[project]
+name = "lore-rendering"
+authors = [
+    {name = "plun1331"}
+]
+description = "Renders text as Minecraft lore."
+version = "1.0.0"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Utilities",
+    "Typing :: Typed",
+]
+dependencies = [
+    "Pillow~=9.5.0",
+]
+
+[tool.setuptools]
+packages = [
+    "lore",
+]
+
+[tool.setuptools.package-data]
+lore = ["fonts/**"]
