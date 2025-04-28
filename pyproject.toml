@@ -2,6 +2,7 @@
 name = "lore-rendering"
 authors = [
     {name = "plun1331"}
+    {name = "poke5352"}
 ]
 description = "Renders text as Minecraft lore."
 version = "1.0.0"
