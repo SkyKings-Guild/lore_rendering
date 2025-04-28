@@ -123,9 +123,12 @@ def process_lines(lore_lines):
 
 
 def calculate_image_size(processed_lines):
+    print(processed_lines)
     # Calculate Height and Width for Image
     width = 0
-    height = 18 + 24 + 20 + 14 + ((len(processed_lines) - 4) * 20)
+    height = 6*2 + 18 + (20 * (len(processed_lines) - 2))
+    if len(processed_lines) > 2:
+        height += 6
     x = 8
     for line in processed_lines:
         if not line == []:
