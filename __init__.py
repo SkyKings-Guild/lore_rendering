@@ -9,9 +9,9 @@ __all__ = (
 )
 
 
-def sync_render(text, return_io=True) -> io.BytesIO | bytes:
+def sync_render(text, *, return_io=True, background: bool = True) -> io.BytesIO | bytes:
     to_pass = text.splitlines()
-    image, images = raw_render(to_pass)
+    image, images = raw_render(to_pass, background=background)
     saved = io.BytesIO()
     if not images:
         image.save(saved, format='png')
@@ -23,10 +23,10 @@ def sync_render(text, return_io=True) -> io.BytesIO | bytes:
     return saved
 
 
-async def render(text, *, loop=None, return_io=True) -> io.BytesIO | bytes:
+async def render(text, *, loop=None, return_io=True, background: bool = True) -> io.BytesIO | bytes:
     loop = loop or asyncio.get_event_loop()
 
     def wrapper():
-        return sync_render(text, return_io=return_io)
+        return sync_render(text, return_io=return_io, background=background)
 
     return await loop.run_in_executor(None, wrapper)
