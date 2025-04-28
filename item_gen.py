@@ -366,21 +366,25 @@ def draw_characters(img, draw, lines, width, height, shadow=False):
     return img, random_detected
 
 
-def render(lines):
+def render(lines, *, background: bool = True):
     # Process lines
     lines = process_lines(lines)
 
     # Get Width and Height
     width, height = calculate_image_size(lines)
     # Intialize Image
-    img = Image.new('RGB', (width, height), color=(0, 0, 0))
+    if background:
+        img = Image.new('RGB', (width, height), color=(0, 0, 0))
+    else:
+        img = Image.new('RGBA', (width, height), color=(0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
 
     # Image Border
-    draw.line((2, 2, 2, height - 3), fill=(44, 8, 99), width=2)
-    draw.line((2, 2, width - 4, 2), fill=(44, 8, 99), width=2)
-    draw.line((width - 4, 2, width - 4, height - 4), fill=(44, 8, 99), width=2)
-    draw.line((2, height - 4, width - 3, height - 4), fill=(44, 8, 99), width=2)
+    if background:
+        draw.line((2, 2, 2, height - 3), fill=(44, 8, 99), width=2)
+        draw.line((2, 2, width - 4, 2), fill=(44, 8, 99), width=2)
+        draw.line((width - 4, 2, width - 4, height - 4), fill=(44, 8, 99), width=2)
+        draw.line((2, height - 4, width - 3, height - 4), fill=(44, 8, 99), width=2)
 
     # Draw Characters
     # Copy Image for GIF
