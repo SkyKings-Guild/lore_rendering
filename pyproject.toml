@@ -19,7 +19,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "Pillow<11",
+    "Pillow~=12.1.0",
 ]
 
 [tool.setuptools]
