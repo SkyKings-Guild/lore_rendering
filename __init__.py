@@ -1,5 +1,6 @@
 import asyncio
 import io
+from typing import Union
 
 from .item_gen import render as raw_render
 
@@ -9,9 +10,9 @@ __all__ = (
 )
 
 
-def sync_render(text, *, return_io=True, background: bool = True) -> io.BytesIO | bytes:
+def sync_render(text, *, return_io=True, background: bool = True, scale: float = 1) -> Union[io.BytesIO, bytes]:
     to_pass = text.splitlines()
-    image, images = raw_render(to_pass, background=background)
+    image, images = raw_render(to_pass, background=background, scale=scale)
     saved = io.BytesIO()
     if not images:
         image.save(saved, format='png')
@@ -23,10 +24,10 @@ def sync_render(text, *, return_io=True, background: bool = True) -> io.BytesIO 
     return saved
 
 
-async def render(text, *, loop=None, return_io=True, background: bool = True) -> io.BytesIO | bytes:
+async def render(text, *, loop=None, return_io=True, background: bool = True, scale: float = 1) -> Union[io.BytesIO, bytes]:
     loop = loop or asyncio.get_event_loop()
 
     def wrapper():
-        return sync_render(text, return_io=return_io, background=background)
+        return sync_render(text, return_io=return_io, background=background, scale=scale)
 
     return await loop.run_in_executor(None, wrapper)

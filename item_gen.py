@@ -368,7 +368,18 @@ def draw_characters(img, draw, lines, width, height, shadow=False):
     return img, random_detected
 
 
-def render(lines, *, background: bool = True):
+def _scale_image(image, scale):
+    if scale == 1:
+        return image
+    width, height = image.size
+    scaled_size = (max(1, int(round(width * scale))), max(1, int(round(height * scale))))
+    return image.resize(scaled_size, Image.Resampling.NEAREST)
+
+
+def render(lines, *, background: bool = True, scale: float = 1):
+    if scale <= 0:
+        raise ValueError("scale must be greater than 0")
+
     # Process lines
     lines = process_lines(lines)
 
@@ -406,5 +417,9 @@ def render(lines, *, background: bool = True):
                 img, draw, lines, width, height
             )
             images.append(img)
+
+    if scale != 1:
+        img = _scale_image(img, scale)
+        images = [_scale_image(frame, scale) for frame in images]
 
     return img, images
