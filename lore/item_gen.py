@@ -374,7 +374,7 @@ def _scale_image(image, scale):
     return image.resize(scaled_size, Image.Resampling.NEAREST)
 
 
-def render(lines, *, scale: float = 1):
+def render(lines, *, scale: float = 1, generate_gif: bool = True):
     if scale <= 0:
         raise ValueError("scale must be greater than 0")
 
@@ -401,7 +401,7 @@ def render(lines, *, scale: float = 1):
 
     img, random_detected = draw_characters(img, draw, lines, width, height)
     images = []
-    if random_detected is True:
+    if generate_gif is True and random_detected is True:
         for i in range(0, 20):
             # Copy Image for GIF
             img = original_image.copy()
