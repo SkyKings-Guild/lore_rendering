@@ -23,10 +23,9 @@ shadow_colors = {
 
 # Fonts
 dir_path = os.path.dirname(os.path.realpath(__file__))
-print(dir_path)
 
-TEXT_PADDING_X = 16
-TEXT_PADDING_Y = 16
+TEXT_PADDING_X = 32
+TEXT_PADDING_Y = 32
 TEXT_Y_OFFSET = TEXT_PADDING_Y - 6
 
 
@@ -394,6 +393,8 @@ def render(lines, *, background: bool = True, scale: float = 1, generate_gif: bo
     # Intialize Image
     if background:
         if background_style:
+            width //= 2
+            height //= 2
             background_img = Image.open(dir_path + f"/textures/{background_style}_background.png").convert("RGBA")
             border_img = Image.open(dir_path + f"/textures/{background_style}_frame.png").convert("RGBA")
 
@@ -417,54 +418,52 @@ def render(lines, *, background: bool = True, scale: float = 1, generate_gif: bo
 
             # If the target size is too small to fit the non-scalable corners/edges,
             # fall back to simple scaling to avoid invalid zero-dimension crops.
-            if width <= left + right or height <= top + bottom:
-                scaled_border = border_img.resize((width, height), Image.Resampling.NEAREST)
-                img.paste(scaled_border, (0, 0), scaled_border)
-            else:
-                # Create an output border image and paste nine regions appropriately.
-                border_out = Image.new('RGBA', (width, height), (0, 0, 0, 0))
+            # Create an output border image and paste nine regions appropriately.
+            border_out = Image.new('RGBA', (width, height), (0, 0, 0, 0))
 
-                # Helper to crop from source border
-                def cbox(x1, y1, x2, y2):
-                    return border_img.crop((x1, y1, x2, y2))
+            # Helper to crop from source border
+            def cbox(x1, y1, x2, y2):
+                return border_img.crop((x1, y1, x2, y2))
 
-                # Corners
-                tl = cbox(0, 0, left, top)
-                tr = cbox(bw - right, 0, bw, top)
-                bl = cbox(0, bh - bottom, left, bh)
-                br = cbox(bw - right, bh - bottom, bw, bh)
-                border_out.paste(tl, (0, 0), tl)
-                border_out.paste(tr, (width - right, 0), tr)
-                border_out.paste(bl, (0, height - bottom), bl)
-                border_out.paste(br, (width - right, height - bottom), br)
+            # Corners
+            tl = cbox(0, 0, left, top)
+            tr = cbox(bw - right, 0, bw, top)
+            bl = cbox(0, bh - bottom, left, bh)
+            br = cbox(bw - right, bh - bottom, bw, bh)
+            border_out.paste(tl, (0, 0), tl)
+            border_out.paste(tr, (width - right, 0), tr)
+            border_out.paste(bl, (0, height - bottom), bl)
+            border_out.paste(br, (width - right, height - bottom), br)
 
-                # Edges (stretched in one direction)
-                top_edge = cbox(left, 0, bw - right, top).resize((width - left - right, top), Image.Resampling.NEAREST)
-                bottom_edge = cbox(left, bh - bottom, bw - right, bh).resize((width - left - right, bottom), Image.Resampling.NEAREST)
-                left_edge = cbox(0, top, left, bh - bottom).resize((left, height - top - bottom), Image.Resampling.NEAREST)
-                right_edge = cbox(bw - right, top, bw, bh - bottom).resize((right, height - top - bottom), Image.Resampling.NEAREST)
-                border_out.paste(top_edge, (left, 0), top_edge)
-                border_out.paste(bottom_edge, (left, height - bottom), bottom_edge)
-                border_out.paste(left_edge, (0, top), left_edge)
-                border_out.paste(right_edge, (width - right, top), right_edge)
+            # Edges (stretched in one direction)
+            top_edge = cbox(left, 0, bw - right, top).resize((width - left - right, top), Image.Resampling.NEAREST)
+            bottom_edge = cbox(left, bh - bottom, bw - right, bh).resize((width - left - right, bottom), Image.Resampling.NEAREST)
+            left_edge = cbox(0, top, left, bh - bottom).resize((left, height - top - bottom), Image.Resampling.NEAREST)
+            right_edge = cbox(bw - right, top, bw, bh - bottom).resize((right, height - top - bottom), Image.Resampling.NEAREST)
+            border_out.paste(top_edge, (left, 0), top_edge)
+            border_out.paste(bottom_edge, (left, height - bottom), bottom_edge)
+            border_out.paste(left_edge, (0, top), left_edge)
+            border_out.paste(right_edge, (width - right, top), right_edge)
 
-                # Center (stretched both directions) - preserves any inner pixels / transparency
-                center = cbox(left, top, bw - right, bh - bottom)
-                center_resized = center.resize((width - left - right, height - top - bottom), Image.Resampling.NEAREST)
-                border_out.paste(center_resized, (left, top), center_resized)
+            # Center (stretched both directions) - preserves any inner pixels / transparency
+            center = cbox(left, top, bw - right, bh - bottom)
+            center_resized = center.resize((width - left - right, height - top - bottom), Image.Resampling.NEAREST)
+            border_out.paste(center_resized, (left, top), center_resized)
 
-                # Composite the constructed border on top of the background
-                img.paste(border_out, (0, 0), border_out)
+            # Composite the constructed border on top of the background
+            img.paste(border_out, (0, 0), border_out)
 
-                # Keep only a 1px outer margin around the visible frame.
-                frame_bbox = border_out.getchannel("A").getbbox()
-                if frame_bbox:
-                    frame_crop_box = (
-                        max(0, frame_bbox[0] - 1),
-                        max(0, frame_bbox[1] - 1),
-                        min(width, frame_bbox[2] + 1),
-                        min(height, frame_bbox[3] + 1),
-                    )
+            img = _scale_image(img, 2)
+
+            # Keep only a 1px outer margin around the visible frame.
+            frame_bbox = border_out.getchannel("A").getbbox()
+            if frame_bbox:
+                frame_crop_box = (
+                    max(0, frame_bbox[0] * 2 - 2),
+                    max(0, frame_bbox[1] * 2 - 2),
+                    min(width * 2, frame_bbox[2] * 2 + 2),
+                    min(height * 2, frame_bbox[3] * 2 + 2),
+                )
 
         else:
             img = Image.new('RGB', (width, height), color=(0, 0, 0))
