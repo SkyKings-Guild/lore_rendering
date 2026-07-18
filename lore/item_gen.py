@@ -25,6 +25,10 @@ shadow_colors = {
 dir_path = os.path.dirname(os.path.realpath(__file__))
 print(dir_path)
 
+TEXT_PADDING_X = 16
+TEXT_PADDING_Y = 16
+TEXT_Y_OFFSET = TEXT_PADDING_Y - 6
+
 
 class Font:
     BOLD = ImageFont.truetype(dir_path + "/fonts/MinecraftBold.otf", 20)
@@ -125,8 +129,10 @@ def process_lines(lore_lines):
 def calculate_image_size(processed_lines):
     # Calculate Height and Width for Image
     width = 0
-    height = 18 + 24 + 20 + 14 + ((len(processed_lines) - 4) * 20)
-    x = 8
+    height = 6*2 + 18 + (20 * (len(processed_lines) - 2)) + (TEXT_Y_OFFSET * 2)
+    if len(processed_lines) > 2:
+        height += 6
+    x = TEXT_PADDING_X
     for line in processed_lines:
         if not line == []:
             for character in line:
@@ -143,8 +149,8 @@ def calculate_image_size(processed_lines):
                     size = int(fnt.getlength(character.character))
                     x += size
             if x > width:
-                width = x + 10
-            x = 8
+                width = x + TEXT_PADDING_X
+            x = TEXT_PADDING_X
     return width, height
 
 
@@ -211,7 +217,7 @@ def draw_characters(img, draw, lines, width, height, shadow=False):
     # Draw Actual Characters
     # K Random Code Character in Image
     random_detected = False
-    x = 8
+    x = TEXT_PADDING_X
     line_number = 0
     for line in lines:
         line_number += 1
@@ -240,14 +246,14 @@ def draw_characters(img, draw, lines, width, height, shadow=False):
                 # Draw Shadow Strike
                 if character.strike is True:
                     if line_number == 1:
-                        y_line = 16
+                        y_line = 16 + TEXT_Y_OFFSET
                         draw.line(
                             (x + 2, y_line, x + 2 + int(fnt.getlength(character.original)), y_line),
                             fill=shadow_color, width=2
                         )
 
                     else:
-                        y_line = 23 + ((line_number - 2) * 7 + (13 * (line_number - 3))) + 10
+                        y_line = 23 + ((line_number - 2) * 7 + (13 * (line_number - 3))) + 10 + TEXT_Y_OFFSET
                         draw.line(
                             (x + 2, y_line, x + 2 + (fnt.getlength(character.original)), y_line),
                             fill=shadow_color, width=2
@@ -256,14 +262,14 @@ def draw_characters(img, draw, lines, width, height, shadow=False):
                 # Draw Shadow Underline
                 if character.underline is True:
                     if line_number == 1:
-                        y_line = 28
+                        y_line = 28 + TEXT_Y_OFFSET
                         draw.line(
                             (x + 2, y_line, x + 2 + int(fnt.getlength(character.original)), y_line),
                             fill=shadow_color, width=2
                         )
 
                     else:
-                        y_line = 23 + ((line_number - 2) * 7 + (13 * (line_number - 3))) + 20
+                        y_line = 23 + ((line_number - 2) * 7 + (13 * (line_number - 3))) + 20 + TEXT_Y_OFFSET
                         draw.line(
                             (x + 2, y_line, x + 2 + int(fnt.getlength(character.original)), y_line),
                             fill=shadow_color, width=2
@@ -275,15 +281,15 @@ def draw_characters(img, draw, lines, width, height, shadow=False):
 
                     # Special Drawing for Unifont Characters
                     if line_number == 1:
-                        draw.text((x, 8), character.character, font=fnt, fill=shadow_color)
-                        draw.text((x, 8), character.character, font=fnt, fill=color)
+                        draw.text((x, 8 + TEXT_Y_OFFSET), character.character, font=fnt, fill=shadow_color)
+                        draw.text((x, 8 + TEXT_Y_OFFSET), character.character, font=fnt, fill=color)
                     else:
                         draw.text(
-                            (x, 25 + ((line_number - 2) * 7 + (13 * (line_number - 3)))), character.character, font=fnt,
+                            (x, 25 + ((line_number - 2) * 7 + (13 * (line_number - 3))) + TEXT_Y_OFFSET), character.character, font=fnt,
                             fill=shadow_color
                         )
                         draw.text(
-                            (x, 25 + ((line_number - 2) * 7 + (13 * (line_number - 3)))), character.character, font=fnt,
+                            (x, 25 + ((line_number - 2) * 7 + (13 * (line_number - 3))) + TEXT_Y_OFFSET), character.character, font=fnt,
                             fill=color
                         )
                 else:
@@ -291,47 +297,47 @@ def draw_characters(img, draw, lines, width, height, shadow=False):
                         # Drawing Italics
                         if line_number == 1:
                             img = draw_italics(
-                                character.character, x + 2, 8, width, height, img, fnt, shadow_color
+                                character.character, x + 2, 8 + TEXT_Y_OFFSET, width, height, img, fnt, shadow_color
                             )
                             img = draw_italics(
-                                character.character, x, 6, width, height, img, fnt, color
+                                character.character, x, 6 + TEXT_Y_OFFSET, width, height, img, fnt, color
                             )
                         else:
                             img = draw_italics(
-                                character.character, x + 2, 25 + ((line_number - 2) * 7 + (13 * (line_number - 3))),
+                                character.character, x + 2, 25 + ((line_number - 2) * 7 + (13 * (line_number - 3))) + TEXT_Y_OFFSET,
                                 width, height, img, fnt, shadow_color
                             )
                             img = draw_italics(
-                                character.character, x, 23 + ((line_number - 2) * 7 + (13 * (line_number - 3))), width,
+                                character.character, x, 23 + ((line_number - 2) * 7 + (13 * (line_number - 3))) + TEXT_Y_OFFSET, width,
                                 height, img, fnt, color
                             )
 
                     else:
                         # Drawing Normal Characters
                         if line_number == 1:
-                            draw.text((x + 2, 8), character.character, font=fnt, fill=shadow_color)
-                            draw.text((x, 6), character.character, font=fnt, fill=color)
+                            draw.text((x + 2, 8 + TEXT_Y_OFFSET), character.character, font=fnt, fill=shadow_color)
+                            draw.text((x, 6 + TEXT_Y_OFFSET), character.character, font=fnt, fill=color)
                         else:
                             draw.text(
-                                (x + 2, 25 + ((line_number - 2) * 7 + (13 * (line_number - 3)))), character.character,
+                                (x + 2, 25 + ((line_number - 2) * 7 + (13 * (line_number - 3))) + TEXT_Y_OFFSET), character.character,
                                 font=fnt, fill=shadow_color
                             )
                             draw.text(
-                                (x, 23 + ((line_number - 2) * 7 + (13 * (line_number - 3)))), character.character,
+                                (x, 23 + ((line_number - 2) * 7 + (13 * (line_number - 3))) + TEXT_Y_OFFSET), character.character,
                                 font=fnt, fill=color
                             )
 
                 # Draw Strike
                 if character.strike is True:
                     if line_number == 1:
-                        y_line = 14
+                        y_line = 14 + TEXT_Y_OFFSET
                         draw.line(
                             (x, y_line, x + int(fnt.getlength(character.original)), y_line),
                             fill=color, width=2
                         )
                     else:
 
-                        y_line = 23 + ((line_number - 2) * 7 + (13 * (line_number - 3))) + 8
+                        y_line = 23 + ((line_number - 2) * 7 + (13 * (line_number - 3))) + 8 + TEXT_Y_OFFSET
                         draw.line(
                             (x, y_line, x + int(fnt.getlength(character.original)), y_line),
                             fill=color, width=2
@@ -340,13 +346,13 @@ def draw_characters(img, draw, lines, width, height, shadow=False):
                 # Draw Underline
                 if character.underline is True:
                     if line_number == 1:
-                        y_line = 24
+                        y_line = 24 + TEXT_Y_OFFSET
                         draw.line(
                             (x, y_line, x + int(fnt.getlength(character.original)), y_line),
                             fill=color, width=2
                         )
                     else:
-                        y_line = 23 + ((line_number - 2) * 7 + (13 * (line_number - 3))) + 18
+                        y_line = 23 + ((line_number - 2) * 7 + (13 * (line_number - 3))) + 18 + TEXT_Y_OFFSET
                         draw.line(
                             (x, y_line, x + int(fnt.getlength(character.original)), y_line),
                             fill=color, width=2
@@ -362,7 +368,7 @@ def draw_characters(img, draw, lines, width, height, shadow=False):
                 else:
                     size = int(fnt.getlength(character.original))
                     x += size
-            x = 8
+            x = TEXT_PADDING_X
     return img, random_detected
 
 
@@ -374,9 +380,11 @@ def _scale_image(image, scale):
     return image.resize(scaled_size, Image.Resampling.NEAREST)
 
 
-def render(lines, *, scale: float = 1, generate_gif: bool = True):
+def render(lines, *, background: bool = True, scale: float = 1, generate_gif: bool = True, background_style: str | None = None):
     if scale <= 0:
         raise ValueError("scale must be greater than 0")
+
+    frame_crop_box = None
 
     # Process lines
     lines = process_lines(lines)
@@ -384,14 +392,92 @@ def render(lines, *, scale: float = 1, generate_gif: bool = True):
     # Get Width and Height
     width, height = calculate_image_size(lines)
     # Intialize Image
-    img = Image.new('RGB', (width, height), color=(0, 0, 0))
+    if background:
+        if background_style:
+            background_img = Image.open(dir_path + f"/textures/{background_style}_background.png").convert("RGBA")
+            border_img = Image.open(dir_path + f"/textures/{background_style}_frame.png").convert("RGBA")
+
+            # stretch background image to fit the width and height
+            # Style backgrounds include transparent outer padding; crop it first so the fill reaches the frame.
+            bg_bbox = background_img.getchannel("A").getbbox()
+            if bg_bbox:
+                background_img = background_img.crop(bg_bbox)
+            background_img = background_img.resize((width, height), Image.Resampling.NEAREST)
+            img = Image.new('RGBA', (width, height))
+            img.paste(background_img, (0, 0))
+
+            # cut out the corners of the border image to maintain scaling, then paste it on top of the background
+            # We perform a 9-slice (3x3) scaling so corners remain unchanged while edges are stretched.
+            BORDER_WIDTH = 24
+            bw, bh = border_img.size
+            left = BORDER_WIDTH
+            right = BORDER_WIDTH
+            top = BORDER_WIDTH
+            bottom = BORDER_WIDTH
+
+            # If the target size is too small to fit the non-scalable corners/edges,
+            # fall back to simple scaling to avoid invalid zero-dimension crops.
+            if width <= left + right or height <= top + bottom:
+                scaled_border = border_img.resize((width, height), Image.Resampling.NEAREST)
+                img.paste(scaled_border, (0, 0), scaled_border)
+            else:
+                # Create an output border image and paste nine regions appropriately.
+                border_out = Image.new('RGBA', (width, height), (0, 0, 0, 0))
+
+                # Helper to crop from source border
+                def cbox(x1, y1, x2, y2):
+                    return border_img.crop((x1, y1, x2, y2))
+
+                # Corners
+                tl = cbox(0, 0, left, top)
+                tr = cbox(bw - right, 0, bw, top)
+                bl = cbox(0, bh - bottom, left, bh)
+                br = cbox(bw - right, bh - bottom, bw, bh)
+                border_out.paste(tl, (0, 0), tl)
+                border_out.paste(tr, (width - right, 0), tr)
+                border_out.paste(bl, (0, height - bottom), bl)
+                border_out.paste(br, (width - right, height - bottom), br)
+
+                # Edges (stretched in one direction)
+                top_edge = cbox(left, 0, bw - right, top).resize((width - left - right, top), Image.Resampling.NEAREST)
+                bottom_edge = cbox(left, bh - bottom, bw - right, bh).resize((width - left - right, bottom), Image.Resampling.NEAREST)
+                left_edge = cbox(0, top, left, bh - bottom).resize((left, height - top - bottom), Image.Resampling.NEAREST)
+                right_edge = cbox(bw - right, top, bw, bh - bottom).resize((right, height - top - bottom), Image.Resampling.NEAREST)
+                border_out.paste(top_edge, (left, 0), top_edge)
+                border_out.paste(bottom_edge, (left, height - bottom), bottom_edge)
+                border_out.paste(left_edge, (0, top), left_edge)
+                border_out.paste(right_edge, (width - right, top), right_edge)
+
+                # Center (stretched both directions) - preserves any inner pixels / transparency
+                center = cbox(left, top, bw - right, bh - bottom)
+                center_resized = center.resize((width - left - right, height - top - bottom), Image.Resampling.NEAREST)
+                border_out.paste(center_resized, (left, top), center_resized)
+
+                # Composite the constructed border on top of the background
+                img.paste(border_out, (0, 0), border_out)
+
+                # Keep only a 1px outer margin around the visible frame.
+                frame_bbox = border_out.getchannel("A").getbbox()
+                if frame_bbox:
+                    frame_crop_box = (
+                        max(0, frame_bbox[0] - 1),
+                        max(0, frame_bbox[1] - 1),
+                        min(width, frame_bbox[2] + 1),
+                        min(height, frame_bbox[3] + 1),
+                    )
+
+        else:
+            img = Image.new('RGB', (width, height), color=(0, 0, 0))
+    else:
+        img = Image.new('RGBA', (width, height), color=(0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
 
     # Image Border
-    draw.line((2, 2, 2, height - 3), fill=(44, 8, 99), width=2)
-    draw.line((2, 2, width - 4, 2), fill=(44, 8, 99), width=2)
-    draw.line((width - 4, 2, width - 4, height - 4), fill=(44, 8, 99), width=2)
-    draw.line((2, height - 4, width - 3, height - 4), fill=(44, 8, 99), width=2)
+    if background and not background_style:
+        draw.line((2, 2, 2, height - 3), fill=(44, 8, 99), width=2)
+        draw.line((2, 2, width - 4, 2), fill=(44, 8, 99), width=2)
+        draw.line((width - 4, 2, width - 4, height - 4), fill=(44, 8, 99), width=2)
+        draw.line((2, height - 4, width - 3, height - 4), fill=(44, 8, 99), width=2)
 
     # Draw Characters
     # Copy Image for GIF
@@ -411,6 +497,10 @@ def render(lines, *, scale: float = 1, generate_gif: bool = True):
                 img, draw, lines, width, height
             )
             images.append(img)
+
+    if frame_crop_box is not None:
+        img = img.crop(frame_crop_box)
+        images = [frame.crop(frame_crop_box) for frame in images]
 
     if scale != 1:
         img = _scale_image(img, scale)

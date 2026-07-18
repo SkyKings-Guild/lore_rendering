@@ -5,7 +5,7 @@ authors = [
     {name = "poke5352"}
 ]
 description = "Renders text as Minecraft lore."
-version = "1.1.0"
+version = "2.0.0"
 readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "MIT"}
