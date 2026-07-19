@@ -436,10 +436,10 @@ def render(lines, *, background: bool = True, scale: float = 1, generate_gif: bo
             border_out.paste(br, (width - right, height - bottom), br)
 
             # Edges (stretched in one direction)
-            top_edge = cbox(left, 0, bw - right, top).resize((width - left - right, top), Image.Resampling.NEAREST)
-            bottom_edge = cbox(left, bh - bottom, bw - right, bh).resize((width - left - right, bottom), Image.Resampling.NEAREST)
-            left_edge = cbox(0, top, left, bh - bottom).resize((left, height - top - bottom), Image.Resampling.NEAREST)
-            right_edge = cbox(bw - right, top, bw, bh - bottom).resize((right, height - top - bottom), Image.Resampling.NEAREST)
+            top_edge = cbox(left, 0, bw - right, top).resize((max(width - left - right, 1), top), Image.Resampling.NEAREST)
+            bottom_edge = cbox(left, bh - bottom, bw - right, bh).resize((max(width - left - right, 1), bottom), Image.Resampling.NEAREST)
+            left_edge = cbox(0, top, left, bh - bottom).resize((left, max(height - top - bottom, 1)), Image.Resampling.NEAREST)
+            right_edge = cbox(bw - right, top, bw, bh - bottom).resize((right, max(height - top - bottom, 1)), Image.Resampling.NEAREST)
             border_out.paste(top_edge, (left, 0), top_edge)
             border_out.paste(bottom_edge, (left, height - bottom), bottom_edge)
             border_out.paste(left_edge, (0, top), left_edge)
@@ -447,7 +447,7 @@ def render(lines, *, background: bool = True, scale: float = 1, generate_gif: bo
 
             # Center (stretched both directions) - preserves any inner pixels / transparency
             center = cbox(left, top, bw - right, bh - bottom)
-            center_resized = center.resize((width - left - right, height - top - bottom), Image.Resampling.NEAREST)
+            center_resized = center.resize((max(width - left - right, 1), max(height - top - bottom, 1)), Image.Resampling.NEAREST)
             border_out.paste(center_resized, (left, top), center_resized)
 
             # Composite the constructed border on top of the background
